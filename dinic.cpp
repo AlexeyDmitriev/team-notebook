@@ -59,8 +59,8 @@ int dfs(int v, int t, int cap) {
 			continue;
 		int pushed = dfs(to, t, min(cap, edges[id].cap - edges[id].flow));
 		if(pushed) {
-			edges[id].flow += cnt;
-			edges[id ^ 1].flow -= cnt;
+			edges[id].flow += pushed;
+			edges[id ^ 1].flow -= pushed;
 			return cnt;
 		}
 	}
