@@ -2,78 +2,80 @@
 #include <iostream>
 #include <memory.h>
 using namespace std;
-const int INF = 1000000000; // greater than max edge capacity
-const int maxn = 5050;
+typedef long long li;
 
+const int INF = 2000000000; // greater than max capacity
+const int maxn = 50000;
 
 struct edge {
 	int from, to, cap, flow;
 };
 
-vector<int> g[maxn];
 vector<edge> edges;
+vector<int> g[maxn];
 
-void add_edge(int from, int to, int cap) {
-	edge e = {from, to, cap, 0};
-	edge e2 = {to, from, 0, 0};
-	g[from].push_back(edges.size());
-	edges.push_back(e);
-	g[to].push_back(edges.size());
-	edges.push_back(e2);
-}
-
-int d[maxn];
 int q[maxn];
-int ptr[maxn];
-int qh, qt;
+int d[maxn];
 
-bool bfs(int from, int t) {
-	qh = qt = 0;
-	q[qt++] = from;
+bool bfs(int s, int t) {
 	memset(d, -1, sizeof d);
-	d[from] = 0;
-	while(qt != qh) {
+	int qh = 0, qt = 0;
+	q[qt++] = s;
+	d[s] = 0;
+	while(qh != qt) {
 		int cur = q[qh++];
-		for(int i = 0; i < (int)(g[cur].size()); ++i) {
+		for(int i = 0; i < (int)g[cur].size(); ++i) {
 			edge& e = edges[g[cur][i]];
-			if(e.cap == e.flow)
-				continue;
-			if(d[e.to] == -1) {
-				d[e.to] = d[cur] + 1;
+			if(e.flow != e.cap && d[e.to] == -1) {
 				q[qt++] = e.to;
+				d[e.to] = d[cur] + 1;
 			}
 		}
 	}
 	return d[t] != -1;
 }
 
-int dfs(int v, int t, int cap) {
+int ptr[maxn];
+
+int dfs(int v, int t, int mx) {
+	if(!mx)
+		return mx;
+
 	if(v == t)
-		return cap;
-	for(int& i = ptr[v]; i < (int)(g[v].size()); ++i) {
+		return mx;
+
+	for(int& i = ptr[v]; i < (int)g[v].size(); ++i) {
 		int id = g[v][i];
-		int to = edges[id].to;
-		if(edges[id].cap == edges[id].flow)
-			continue;
-		if(d[v] + 1 != d[to])
-			continue;
-		int pushed = dfs(to, t, min(cap, edges[id].cap - edges[id].flow));
-		if(pushed) {
-			edges[id].flow += pushed;
-			edges[id ^ 1].flow -= pushed;
-			return cnt;
+		edge& e = edges[id];
+		if(d[e.to] == d[v] + 1) {
+			if(int pushed = dfs(e.to, t, min(mx, li(e.cap - e.flow)))) {
+				e.flow += pushed;
+				edges[id ^ 1].flow -= pushed;
+				return pushed;
+			}
 		}
 	}
 	return 0;
 }
 
-int dinic(int s, int t) {
-	int fl = 0;
+li dinic(int s, int t) {
+	li res = 0;
 	while(bfs(s, t)) {
 		memset(ptr, 0, sizeof ptr);
-		while(int cnt = dfs(s, t, INF))
-			fl += cnt;
+
+		while(int pushed = dfs(s, t, INF)) {
+			res += pushed;
+		}
 	}
-	return fl;
+	return res;
+}
+
+void add_edge(int from, int to, int cap) {
+	edge e1 = {from, to, cap, 0};
+	edge e2 = {to, from, 0,0};
+	g[from].push_back(edges.size());
+	edges.push_back(e1);
+	g[to].push_back(edges.size());
+	edges.push_back(e2);
 }
 
