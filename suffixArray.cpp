@@ -11,14 +11,14 @@ using namespace std;
 void Build(const string& init, vector <int>& suffArray, vector <int>& lcp) {
 	string s = init;
 	s.push_back(char(0));
-	/*здесь будут храниться индексы первых элементов классов в суффиксном массиве после сортировки по 1-му символу*/
+	/*Р·РґРµСЃСЊ Р±СѓРґСѓС‚ С…СЂР°РЅРёС‚СЊСЃСЏ РёРЅРґРµРєСЃС‹ РїРµСЂРІС‹С… СЌР»РµРјРµРЅС‚РѕРІ РєР»Р°СЃСЃРѕРІ РІ СЃСѓС„С„РёРєСЃРЅРѕРј РјР°СЃСЃРёРІРµ РїРѕСЃР»Рµ СЃРѕСЂС‚РёСЂРѕРІРєРё РїРѕ 1-РјСѓ СЃРёРјРІРѕР»Сѓ*/
 	vector <int> head;
-	/*color[i] - класс суффикса, начинающегося с i-го символа*/
+	/*color[i] - РєР»Р°СЃСЃ СЃСѓС„С„РёРєСЃР°, РЅР°С‡РёРЅР°СЋС‰РµРіРѕСЃСЏ СЃ i-РіРѕ СЃРёРјРІРѕР»Р°*/
 	vector <int> color;
-	/*то же, что и color, будет использоваться во время сортировки*/
+	/*С‚Рѕ Р¶Рµ, С‡С‚Рѕ Рё color, Р±СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РІРѕ РІСЂРµРјСЏ СЃРѕСЂС‚РёСЂРѕРІРєРё*/
 	vector <int> colorSub;
 	vector <int> suffArraySub;
-	/*256 - максимальный символ алфавита*/
+	/*256 - РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЃРёРјРІРѕР» Р°Р»С„Р°РІРёС‚Р°*/
 	head.assign(max((int)s.size(), 256), 0); 
 	suffArray.resize(s.size());
 	color.resize(s.size());
@@ -26,7 +26,7 @@ void Build(const string& init, vector <int>& suffArray, vector <int>& lcp) {
 	suffArraySub.resize(s.size());
 	lcp.resize(s.size());
 
-	/*выполняем сортировку суффиксов по первому символу*/
+	/*РІС‹РїРѕР»РЅСЏРµРј СЃРѕСЂС‚РёСЂРѕРІРєСѓ СЃСѓС„С„РёРєСЃРѕРІ РїРѕ РїРµСЂРІРѕРјСѓ СЃРёРјРІРѕР»Сѓ*/
 	for (int i = 0; i < s.size(); ++i) {
 		++head[s[i]];
 	}
@@ -41,9 +41,9 @@ void Build(const string& init, vector <int>& suffArray, vector <int>& lcp) {
 		suffArray[head[s[i]]] = i;
 		++head[s[i]];
 	}
-	/*в suffArray суффиксы отсортированы по первому символу*/
+	/*РІ suffArray СЃСѓС„С„РёРєСЃС‹ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅС‹ РїРѕ РїРµСЂРІРѕРјСѓ СЃРёРјРІРѕР»Сѓ*/
 
-	/*разбиваем суффиксы на классы, приводим head к определению, данному в начале*/
+	/*СЂР°Р·Р±РёРІР°РµРј СЃСѓС„С„РёРєСЃС‹ РЅР° РєР»Р°СЃСЃС‹, РїСЂРёРІРѕРґРёРј head Рє РѕРїСЂРµРґРµР»РµРЅРёСЋ, РґР°РЅРЅРѕРјСѓ РІ РЅР°С‡Р°Р»Рµ*/
 	int numberOfClasses = 1;
 	head[0] = 0;
 	for (int i = 1; i < s.size(); ++i) {
@@ -54,9 +54,9 @@ void Build(const string& init, vector <int>& suffArray, vector <int>& lcp) {
 		color[suffArray[i]] = numberOfClasses - 1;
 	}
 
-	/*сортировка*/
+	/*СЃРѕСЂС‚РёСЂРѕРІРєР°*/
 	for (int k = 1; k < s.size(); k *= 2) {
-		/*сортировка по подстрокам длины 2*k*/
+		/*СЃРѕСЂС‚РёСЂРѕРІРєР° РїРѕ РїРѕРґСЃС‚СЂРѕРєР°Рј РґР»РёРЅС‹ 2*k*/
 
 		for (int i = 0; i < s.size(); ++i) {
 			int firstPartBeginning = suffArray[i] - k;
@@ -68,7 +68,7 @@ void Build(const string& init, vector <int>& suffArray, vector <int>& lcp) {
 		}
 		suffArray = suffArraySub;
 
-		/*строим color и head*/
+		/*СЃС‚СЂРѕРёРј color Рё head*/
 		int secondPartBeginning;
 		pair <int, int> prevSuffClasses, curSuffClasses;
 		curSuffClasses = make_pair(-1, 0);
@@ -92,13 +92,13 @@ void Build(const string& init, vector <int>& suffArray, vector <int>& lcp) {
 
 		color = colorSub;
 
-		/*если число классов достигло количества суффиксов -> в suffArray правильный суффмассив*/
+		/*РµСЃР»Рё С‡РёСЃР»Рѕ РєР»Р°СЃСЃРѕРІ РґРѕСЃС‚РёРіР»Рѕ РєРѕР»РёС‡РµСЃС‚РІР° СЃСѓС„С„РёРєСЃРѕРІ -> РІ suffArray РїСЂР°РІРёР»СЊРЅС‹Р№ СЃСѓС„С„РјР°СЃСЃРёРІ*/
 		if (numberOfClasses == s.size())
 			break;
 	}
 
-	/*алгоритм Касаи для построения lcp*/
-	/*pos[i] - позиция суффикса, начинающегося с символа i в suffArray*/
+	/*Р°Р»РіРѕСЂРёС‚Рј РљР°СЃР°Рё РґР»СЏ РїРѕСЃС‚СЂРѕРµРЅРёСЏ lcp*/
+	/*pos[i] - РїРѕР·РёС†РёСЏ СЃСѓС„С„РёРєСЃР°, РЅР°С‡РёРЅР°СЋС‰РµРіРѕСЃСЏ СЃ СЃРёРјРІРѕР»Р° i РІ suffArray*/
 	vector <int> pos; 
 	int curLcp = 0;
 	pos.resize(s.size());
@@ -124,7 +124,7 @@ void Build(const string& init, vector <int>& suffArray, vector <int>& lcp) {
 	}
 }
 
-/*нахождение lcp для строки a со сдвигом aShift и строки b со сдвигом bShift*/
+/*РЅР°С…РѕР¶РґРµРЅРёРµ lcp РґР»СЏ СЃС‚СЂРѕРєРё a СЃРѕ СЃРґРІРёРіРѕРј aShift Рё СЃС‚СЂРѕРєРё b СЃРѕ СЃРґРІРёРіРѕРј bShift*/
 int GetBruteLcp(const string& a, int aShift, const string& b, int bShift) {
 	for (int i = 0;;++i) {
 		if (i + aShift == a.size()) {
@@ -139,8 +139,8 @@ int GetBruteLcp(const string& a, int aShift, const string& b, int bShift) {
 	}
 }
 
-/*построение sparse table по минимуму для вектора а*/
-/*в precalc: precalc[i] - максимальная степень двойки <= i*/
+/*РїРѕСЃС‚СЂРѕРµРЅРёРµ sparse table РїРѕ РјРёРЅРёРјСѓРјСѓ РґР»СЏ РІРµРєС‚РѕСЂР° Р°*/
+/*РІ precalc: precalc[i] - РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ СЃС‚РµРїРµРЅСЊ РґРІРѕР№РєРё <= i*/
 void BuildSparseTable(const vector <int>& a, vector < vector <int> >& sparseTable, vector <int>& precalc) {
 	precalc.resize(a.size() + 1);
 	precalc[1] = precalc[0] = 0;
@@ -173,80 +173,80 @@ int GetMin(int l, int r, const vector < vector <int> >& sparseTable, const vecto
 	return min(sparseTable[l][precalc[r - l + 1]], sparseTable[r - (1 << precalc[r - l + 1]) + 1][precalc[r - l + 1]]);
 }
 
-/* нахождение всех вхождений строки t в строку s*/
-/* suffArray - суфф массив по s*/
-/* sparseTable по lcp для suffArray*/
-/* precalc для sparseTable*/
-/* в positions - начала всех вхождений t в s*/
+/* РЅР°С…РѕР¶РґРµРЅРёРµ РІСЃРµС… РІС…РѕР¶РґРµРЅРёР№ СЃС‚СЂРѕРєРё t РІ СЃС‚СЂРѕРєСѓ s*/
+/* suffArray - СЃСѓС„С„ РјР°СЃСЃРёРІ РїРѕ s*/
+/* sparseTable РїРѕ lcp РґР»СЏ suffArray*/
+/* precalc РґР»СЏ sparseTable*/
+/* РІ positions - РЅР°С‡Р°Р»Р° РІСЃРµС… РІС…РѕР¶РґРµРЅРёР№ t РІ s*/
 void find(const string& s, const string& t, const vector <int>& suffArray, 
 		  const vector < vector <int> >& sparseTable, const vector <int>& precalc, vector <int>& positions) {
 	
-	/*будем делать 2 бинпоиска: первый для нахождения минимального суффикса, начинающегося с t
-								второй для нахождения максимального суффикса, начинающегося с t*/
+	/*Р±СѓРґРµРј РґРµР»Р°С‚СЊ 2 Р±РёРЅРїРѕРёСЃРєР°: РїРµСЂРІС‹Р№ РґР»СЏ РЅР°С…РѕР¶РґРµРЅРёСЏ РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ СЃСѓС„С„РёРєСЃР°, РЅР°С‡РёРЅР°СЋС‰РµРіРѕСЃСЏ СЃ t
+								РІС‚РѕСЂРѕР№ РґР»СЏ РЅР°С…РѕР¶РґРµРЅРёСЏ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЃСѓС„С„РёРєСЃР°, РЅР°С‡РёРЅР°СЋС‰РµРіРѕСЃСЏ СЃ t*/
 	int leftBorder, rightBorder;
-	/*leftBorder - позиция минимального суффикса, начинающегося с t, в суффмассиве*/
-	/*rightBorder - позиция максимального суффикса, начинающегося с t, в суффмассиве*/
+	/*leftBorder - РїРѕР·РёС†РёСЏ РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ СЃСѓС„С„РёРєСЃР°, РЅР°С‡РёРЅР°СЋС‰РµРіРѕСЃСЏ СЃ t, РІ СЃСѓС„С„РјР°СЃСЃРёРІРµ*/
+	/*rightBorder - РїРѕР·РёС†РёСЏ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЃСѓС„С„РёРєСЃР°, РЅР°С‡РёРЅР°СЋС‰РµРіРѕСЃСЏ СЃ t, РІ СЃСѓС„С„РјР°СЃСЃРёРІРµ*/
 	int l = 0;
 	int r = suffArray.size() - 1;
-	/*mlrLeft - lcp строки t и минимального суффикса*/
-	/*mlrRight - lcp строки t и максимального суффикса*/
+	/*mlrLeft - lcp СЃС‚СЂРѕРєРё t Рё РјРёРЅРёРјР°Р»СЊРЅРѕРіРѕ СЃСѓС„С„РёРєСЃР°*/
+	/*mlrRight - lcp СЃС‚СЂРѕРєРё t Рё РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ СЃСѓС„С„РёРєСЃР°*/
 	int mlrLeft = GetBruteLcp(s, suffArray.front(), t, 0);
 	int mlrRight = GetBruteLcp(s, suffArray.back(), t, 0);
 
-	/*первый бинпоиск*/
+	/*РїРµСЂРІС‹Р№ Р±РёРЅРїРѕРёСЃРє*/
 	while (true) {
 		if (mlrLeft == t.size()) {
-			/*значит нашли ответ*/
+			/*Р·РЅР°С‡РёС‚ РЅР°С€Р»Рё РѕС‚РІРµС‚*/
 			leftBorder = l;
 			break;
 		}
 		if (l == r) {
-			/*значит ни один суффикс не начинается с t*/
+			/*Р·РЅР°С‡РёС‚ РЅРё РѕРґРёРЅ СЃСѓС„С„РёРєСЃ РЅРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ t*/
 			return ;
 		}
 		if (l == r - 1) {
 			if (mlrRight == t.size()) {
-				/*значит нашли ответ*/
+				/*Р·РЅР°С‡РёС‚ РЅР°С€Р»Рё РѕС‚РІРµС‚*/
 				leftBorder = r;
 				break;
 			}
 			else {
-				/*значит ни один суффикс не начинается с t*/
+				/*Р·РЅР°С‡РёС‚ РЅРё РѕРґРёРЅ СЃСѓС„С„РёРєСЃ РЅРµ РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ t*/
 				return ;
 			}
 		}
 
-		/*теперь middle != l и middle != r*/
+		/*С‚РµРїРµСЂСЊ middle != l Рё middle != r*/
 		int middle = (l + r) / 2;
-		/*lcpLeftMiddle - lcp суффикса, находящегося на позиции l в suffArray, 
-							и суффикса, находящегося на позиции middle в suffArray*/
-		/*lcpRightMiddle - lcp суффикса, находящегося на позиции r в suffArray, 
-							и суффикса, находящегося на позиции middle в suffArray*/
+		/*lcpLeftMiddle - lcp СЃСѓС„С„РёРєСЃР°, РЅР°С…РѕРґСЏС‰РµРіРѕСЃСЏ РЅР° РїРѕР·РёС†РёРё l РІ suffArray, 
+							Рё СЃСѓС„С„РёРєСЃР°, РЅР°С…РѕРґСЏС‰РµРіРѕСЃСЏ РЅР° РїРѕР·РёС†РёРё middle РІ suffArray*/
+		/*lcpRightMiddle - lcp СЃСѓС„С„РёРєСЃР°, РЅР°С…РѕРґСЏС‰РµРіРѕСЃСЏ РЅР° РїРѕР·РёС†РёРё r РІ suffArray, 
+							Рё СЃСѓС„С„РёРєСЃР°, РЅР°С…РѕРґСЏС‰РµРіРѕСЃСЏ РЅР° РїРѕР·РёС†РёРё middle РІ suffArray*/
 		int lcpLeftMiddle = GetMin(l, middle, sparseTable, precalc);
 		int lcpRightMiddle = GetMin(middle, r, sparseTable, precalc);
-		/*mlrMiddle - lcp строки t и суффикса, находящегося на позиции middle в suffArray*/
+		/*mlrMiddle - lcp СЃС‚СЂРѕРєРё t Рё СЃСѓС„С„РёРєСЃР°, РЅР°С…РѕРґСЏС‰РµРіРѕСЃСЏ РЅР° РїРѕР·РёС†РёРё middle РІ suffArray*/
 		int mlrMiddle = max(min(lcpLeftMiddle, mlrLeft), min(lcpRightMiddle, mlrRight));
-		/*но, возможно, его можно увеличить*/
+		/*РЅРѕ, РІРѕР·РјРѕР¶РЅРѕ, РµРіРѕ РјРѕР¶РЅРѕ СѓРІРµР»РёС‡РёС‚СЊ*/
 		mlrMiddle += GetBruteLcp(s, suffArray[middle] + mlrMiddle, t, mlrMiddle);
 		if (mlrMiddle == t.size()) {
-			/*тогда ответ может находиться только между l и middle*/
+			/*С‚РѕРіРґР° РѕС‚РІРµС‚ РјРѕР¶РµС‚ РЅР°С…РѕРґРёС‚СЊСЃСЏ С‚РѕР»СЊРєРѕ РјРµР¶РґСѓ l Рё middle*/
 			r = middle;
 			mlrRight = mlrMiddle;
 			continue;
 		}
 		
-		/*less = true, если суффикс, находящегося на позиции middle в suffArray, меньше строки t*/
+		/*less = true, РµСЃР»Рё СЃСѓС„С„РёРєСЃ, РЅР°С…РѕРґСЏС‰РµРіРѕСЃСЏ РЅР° РїРѕР·РёС†РёРё middle РІ suffArray, РјРµРЅСЊС€Рµ СЃС‚СЂРѕРєРё t*/
 		bool less = false;
 		if (suffArray[middle] + mlrMiddle == s.size() || s[suffArray[middle] + mlrMiddle] < t[mlrMiddle]) {
 			less = true;	
 		}
 		if (less) {
-			/*тогда нужно искать между middle и r*/
+			/*С‚РѕРіРґР° РЅСѓР¶РЅРѕ РёСЃРєР°С‚СЊ РјРµР¶РґСѓ middle Рё r*/
 			l = middle;
 			mlrLeft = mlrMiddle;
 		}
 		else {
-			/*тогда нужно искать между l и middle*/
+			/*С‚РѕРіРґР° РЅСѓР¶РЅРѕ РёСЃРєР°С‚СЊ РјРµР¶РґСѓ l Рё middle*/
 			r = middle;
 			mlrRight = mlrMiddle;
 		}
@@ -256,7 +256,7 @@ void find(const string& s, const string& t, const vector <int>& suffArray,
 	r = suffArray.size() - 1;
 	mlrLeft = GetBruteLcp(s, suffArray.front(), t, 0);
 	mlrRight = GetBruteLcp(s, suffArray.back(), t, 0);
-	/*второй бинпоиск*/
+	/*РІС‚РѕСЂРѕР№ Р±РёРЅРїРѕРёСЃРє*/
 	while (true) {
 		if (mlrRight == t.size()) {
 			rightBorder = r;
