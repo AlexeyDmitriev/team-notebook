@@ -26,7 +26,7 @@ void add_edge(int from, int to, int_e cost, int cap) {
 int_e mincost(int n, int s, int t) {
 	int_e cost = 0;
 	int flow = 0;
-	while(true) {
+	while(flow < NEED_FLOW) {
 		vector<int> p(n, -1);
 		vector<int_e> d(n);
 		d[s] = 0;
@@ -60,8 +60,6 @@ int_e mincost(int n, int s, int t) {
 			maxAdd = min(maxAdd, e.cap - e.flow);
 		}
 
-		if(d[t] == 0)
-			break;
 		flow += maxAdd;
 		cost += d[t] * maxAdd;
 		cur = t;
