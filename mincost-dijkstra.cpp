@@ -85,6 +85,10 @@ pi mincost(int n, int s, int t) {
 		
 		if(p[t] == -1)
 			break;
+			
+		if(d[t] >= 0) { // only for mincost, not mincostmaxflow
+			break;
+		}
 
 		int cur = t;
 		int maxAdd = NEED_FLOW - flow;
