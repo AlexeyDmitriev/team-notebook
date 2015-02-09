@@ -5,7 +5,7 @@ using namespace std;
 
 const int maxn = 2002;
 const int NEED_FLOW = 1000000000;
-typedef int int_e;
+typedef long long int_e;
 
 struct edge {
 	int from, to;
@@ -23,7 +23,7 @@ void add_edge(int from, int to, int_e cost, int cap) {
 	edges.push_back(e2);
 }
 
-int_e mincost(int n, int s, int t) {
+pair<int, int_e> mincost(int n, int s, int t) {
 	int_e cost = 0;
 	int flow = 0;
 	while(flow < NEED_FLOW) {
@@ -48,9 +48,9 @@ int_e mincost(int n, int s, int t) {
 		if(p[t] == -1)
 			break;
 
-		if(d[t] >= 0) { // only for mincost, not mincostmaxflow
-			break;
-		}
+		//if(d[t] >= 0) { // only for mincost, not mincostmaxflow
+		//	break;
+		//}
 
 		int cur = t;
 		int maxAdd = NEED_FLOW - flow;
@@ -72,5 +72,5 @@ int_e mincost(int n, int s, int t) {
 	}
 
 	// cost and flow are final here
-	return cost;
+	return make_pair(flow, cost);
 }
