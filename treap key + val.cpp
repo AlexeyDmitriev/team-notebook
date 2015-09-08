@@ -80,6 +80,28 @@ public:
 		return Size;
 	}
 
+	node get_min() const {
+		node v = root;
+		if (!v) {
+			throw runtime_error("Treap is empty");
+		}
+		while (v->l) {
+			v = v->l;
+		}
+		return v;
+	}
+
+	node get_max() const {
+		node v = root;
+		if (!v) {
+			throw runtime_error("Treap is empty");
+		}
+		while (v->r) {
+			v = v->r;
+		}
+		return v;
+	}
+
 	void insert(int key, int val) { //insert at the idx - position
 		node l = nullptr, r = nullptr;
 		split(root, key, l, r);
