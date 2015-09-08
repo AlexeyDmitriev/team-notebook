@@ -8,6 +8,10 @@ public:
 		_node* r;
 		_node(int val) :val(val), l(nullptr), r(nullptr), cnt(1) { prior = (rand() << 16) | rand(); }
 
+		void push() {
+			
+		}
+		
 		void recalc() {
 			cnt = 1 + Cnt(l) + Cnt(r);
 		}
@@ -35,11 +39,13 @@ public:
 		if (!r)
 			return l;
 		if (l->prior < r->prior) {
+			l->push();
 			l->r = merge(l->r, r);
 			l->recalc();
 			return l;
 		}
 		else {
+			r->push();
 			r->l = merge(l, r->l);
 			r->recalc();
 			return r;
@@ -50,6 +56,7 @@ public:
 		l = r = nullptr;
 		if (!v)
 			return;
+		v->push();
 		if (Cnt(v->l) < idx) {
 			l = v;
 			split(l->r, idx - Cnt(v->l) - 1, l->r, r);
