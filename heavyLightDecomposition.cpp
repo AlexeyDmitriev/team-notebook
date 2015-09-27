@@ -1,403 +1,433 @@
-#include <iostream> 
-#include <cstdio> 
-#include <set> 
-#include <map> 
-#include <vector> 
-#include <queue> 
-#include <stack> 
-#include <cmath> 
-#include <algorithm> 
-#include <cstring> 
-#include <bitset> 
-#include <ctime> 
+//J2 - Sometimes Naive from ptz summer 2015
+//MIPT Ababahalamaha
+#define _CRT_SECURE_NO_WARNINGS
+#pragma comment (linker, "/STACK:128000000")
+#include <stdio.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <functional>
+#include <queue>
+#include <deque>
+#include <cmath>
+#include <ctime>
+#include <stack>
+#include <set>
+#include <map>
+#include <cassert>
+#include <memory.h>
 #include <sstream>
-#include <stack> 
-#include <cassert> 
-#include <list> 
-//#include <unordered_set> 
-using namespace std;
-typedef long long int64;
-typedef long double ld;
-typedef vector<int> vi;
-typedef pair<int, int> pi;
 
-#define mp make_pair 
-#define pb push_back 
-#define all(s) s.begin(), s.end() 
+using namespace std;
+
+#define mp make_pair
+#define pb push_back
+#define all(a) a.begin(), a.end()
+
+#define forn(i, n) for (int i = 0; i < (int)(n); ++i)
+
+typedef long long li;
+typedef long long i64;
+typedef double ld;
+typedef vector<int> vi;
+typedef pair <int, int> pi;
+
 void solve();
 
-#define NAME "changemeplease"
-int main() {
-#ifdef YA 
-	cerr << NAME << endl;
-	freopen("input.txt", "r", stdin);
-	//freopen("output.txt", "w", stdout); 
-	clock_t start = clock();
-#else 
-	//freopen("input.txt", "r", stdin); 
-	//freopen("output.txt", "w", stdout); 
-#endif 
-	//ios_base::sync_with_stdio(false);
-	cout << fixed;
-	cout.precision(10);
-	int t = 1;
-	//cin >> t;	 
-	while (t--)
-		solve();
+void precalc();
 
-#ifdef YA 
-	cout << "\n\n\nTime:" << ((clock() - start) / 1.0 / CLOCKS_PER_SEC);
-#endif 
+int TESTNUM = 0;
+#define FILENAME ""
+
+int main() {
+	string s = FILENAME;
+#ifdef YA
+	//assert(!s.empty());
+	freopen("input.txt", "r", stdin);
+	//freopen("output.txt", "w", stdout);
+	//cerr<<FILENAME<<endl;
+	//assert (s != "change me please");
+	clock_t start = clock();
+#else
+	//freopen("input.txt", "r", stdin);
+	//freopen("output.txt", "w", stdout);
+	//freopen(FILENAME ".in", "r", stdin);
+	//freopen(FILENAME ".out", "w", stdout); 
+	cin.tie(0);
+#endif
+	cout.sync_with_stdio(0);
+	cout.precision(10);
+	cout << fixed;
+	precalc();
+	int t = 1;
+	cin >> t;
+	while (t--) {
+		++TESTNUM;
+		solve();
+	}
+#ifdef YA
+	cerr << "\n\n\n" << (clock() - start) / 1.0 / CLOCKS_PER_SEC << "\n\n\n";
+#endif
 	return 0;
 }
 
-struct node {
-	int l;
-	int r;
-	int push;
-	int leftmost;
-	int rightmost;
-	int val;
-	node(){}
-	node(int val, int l, int r, int leftmost, int rightmost):val(val), l(l), r(r), leftmost(leftmost), rightmost(rightmost), push(-1) {}
+//#define int li
+
+/*int pr[] = { 97, 2011 };
+int mods[] = { 1000000007, 1000000009 };
+
+const int C = 100500;
+int powers[2][C];*/
+
+int mod = 1000000007;
+
+//int c[5010][5010];
+
+//int catalan[200500];
+
+//ld doubleC[100][100];
+
+void precalc() {}
+
+
+struct Node {
+	Node* left, *right;
+	int data;
+	Node(int data) :left(0), right(0), data(data){}
 };
 
-int n;
-vector < vector <int> > g;
-vector <int> sum;
-vector <int> parent;
-vector <vector <int> > up;
-vector <int> time_in, time_out;
-vector <int> color;
-vector <int> path_position;
-vector < vector <int> > paths;
-vector < vector <node> > trees;
-vector <int> roots;
-int log_n;
-
-bool is_heavy(int from, int to) {
-	if (sum[to] > sum[from] / 2) {
-		return true;
-	}
-	return false;
-}
-
-void dfs(int v, int& timer) {
-	time_in[v] = ++timer;
-
-	if (parent[v] == -1) {
-		up[v].assign(log_n, -1);
-	}
-	else {
-		up[v].assign(log_n, -1);
-		up[v][0] = parent[v];
-		for (int i = 1; i < log_n; ++i) {
-			if (up[v][i - 1] == -1)
-				break;
-			up[v][i] = up[up[v][i - 1]][i - 1];
-		}
+Node* build(int l, int r, const vector <int> &t) {
+	if (l == r - 1) {
+		return new Node(t[l]);
 	}
 
-	sum[v] = 1;
-
-	for (int i = 0; i < g[v].size(); ++i) {
-		int to = g[v][i];
-		if (to == parent[v]) {
-			continue;
-		}
-		parent[to] = v;
-		dfs(to, timer);
-		sum[v] += sum[to];
-	}
-
-	time_out[v] = ++timer;
-}
-
-int init_rsq(vector <node>& tree, int l, int r) {
-	if (l == r) {
-		int id = tree.size();
-		tree.push_back(node(0, -1, -1, 0, 0));
-		return id;
-	}
 	int m = (l + r) / 2;
-	int left_child = init_rsq(tree, l, m);
-	int right_child = init_rsq(tree, m + 1, r);
-	int id = tree.size();
-	tree.push_back(node(0, left_child, right_child, 0, 0));
-	return id;
+
+	Node* le = build(l, m, t);
+	Node* re = build(m, r, t);
+
+	Node* result = new Node((le->data + re->data) % mod);
+	result->left = le;
+	result->right = re;
+	return result;
 }
 
-void push_modify(int i, vector <node>& tree) {
-	if (tree[i].push == -1) {
-		return ;
-	}
-	if (tree[i].l == -1) {
-		tree[i].push = -1;
-		return ;
-	}
-
-	tree[tree[i].l].leftmost = tree[tree[i].l].rightmost = tree[i].push;
-	tree[tree[i].r].leftmost = tree[tree[i].r].rightmost = tree[i].push;
-	tree[tree[i].l].push = tree[tree[i].r].push = tree[i].push;
-	tree[tree[i].l].val = tree[tree[i].r].val = 0;	
-	
-	tree[i].push = -1;
-}
-
-void add(int l, int r, int i, vector <node>& tree, int x, int L, int R) {
-	if (l > R || L > r) {
-		return ;
-	}
-	if (l <= L && R <= r) {
-		tree[i].leftmost = tree[i].rightmost = tree[i].push = x;
-		tree[i].val = 0;
+void nmodify(Node* v, int l, int r, int pos, int val, bool diff=false) {
+	if (pos < l || pos >= r) {
 		return;
 	}
-	push_modify(i, tree);
-	
-	int m = (L + R) / 2;
-	add(l, r, tree[i].l, tree, x, L, m);
-	add(l, r, tree[i].r, tree, x, m + 1, R);
-	tree[i].leftmost = tree[tree[i].l].leftmost;
-	tree[i].rightmost = tree[tree[i].r].rightmost;
-	tree[i].val = tree[tree[i].l].val + tree[tree[i].r].val;
-	if (tree[tree[i].l].rightmost != tree[tree[i].r].leftmost)
-		++tree[i].val;
+	if (l == r - 1 && pos == l) {
+		if (!diff) {
+			v->data = val;
+		}
+		else {
+			v->data = (v->data + val) % mod;
+		}
+		return;
+	}
+
+	int m = (l + r) / 2;
+
+	nmodify(v->left, l, m, pos, val, diff);
+	nmodify(v->right, m, r, pos, val, diff);
+	v->data = (v->left->data + v->right->data) % mod;
 }
 
-int get_rsq(int l, int r, int i, vector <node>& tree, int L, int R, int& leftmost, int& rightmost) {
-	if (l > R || L > r) {
-		leftmost = rightmost = -1;
+int getsum(int l, int r, Node* v, int L, int R) {
+	if (r <= L || R <= l) {
 		return 0;
 	}
-	push_modify(i, tree);
 	if (l <= L && R <= r) {
-		leftmost = tree[i].leftmost;
-		rightmost = tree[i].rightmost;
-		return tree[i].val;
+		return v->data;
 	}
-
 	int m = (L + R) / 2;
+	return (getsum(l, r, v->left, L, m) + getsum(l, r, v->right, m, R)) % mod;
+}
 
-	int left_leftmost;
-	int left_rightmost;
-	int right_leftmost;
-	int right_rightmost;
-	
-	int suml = get_rsq(l, r, tree[i].l, tree, L, m, left_leftmost, left_rightmost);
-	int sumr = get_rsq(l, r, tree[i].r, tree, m + 1, R, right_leftmost, right_rightmost);
-	
-	if (left_leftmost == -1) {
-		leftmost = right_leftmost;
-		rightmost = right_rightmost;
-		return sumr;
+struct tree {
+	Node* root;
+	int sz;
+	tree(const vector <int>& t) {
+		sz = t.size();
+		root = build(0, t.size(), t);
 	}
-	if (right_leftmost == -1) {
-		leftmost = left_leftmost;
-		rightmost = left_rightmost;
-		return suml;
+	void modify(int pos, int val, bool diff=false) {
+		nmodify(root, 0, sz, pos, val, diff);
 	}
-	
-	leftmost = left_leftmost;
-	rightmost = right_rightmost;
-	if (left_rightmost != right_leftmost) {
-		return suml + sumr + 1;
+	int getsum(int l, int r) {
+		return ::getsum(l, r, root, 0, sz);
+	}
+};
+
+const int maxn = 100000;
+const int log_n = 17;
+const int tree_root = 0;
+
+int n;
+vector < vector<int> > g;
+vector <pi> hvl_path;
+int sz[maxn];
+int tree_pos[maxn];
+int tree_end[maxn];
+int depth[maxn];
+//vector <vector <int> > anc;
+int anc[log_n][maxn];
+tree* hvl_tree[maxn];
+
+
+vector <int> allv;
+int cnt_sum[maxn];
+int all_sum[maxn];
+pair <int, int> my_ch[maxn];
+int w[maxn];
+int next_in_tree[maxn];
+tree* my_rsq;
+
+int m;
+
+int dfs(int v, int p) {
+	all_sum[v] = w[v];
+	my_ch[v].first = allv.size();
+	allv.push_back(v);
+
+	depth[v] = p == -1 ? 0 : depth[p] + 1;
+	anc[0][v] = p == -1 ? tree_root : p;
+	sz[v] = 1;
+	if (p != -1) {
+		g[v].erase(find(g[v].begin(), g[v].end(), p));
+	}
+	cnt_sum[v] = 0;
+	for (int to : g[v])	{
+		sz[v] += dfs(to, v);
+		all_sum[v] += all_sum[to];
+		all_sum[v] %= mod;
+		cnt_sum[v] += li(all_sum[to]) * all_sum[to] % mod;
+		cnt_sum[v] %= mod;
+	}
+
+	my_ch[v].second = allv.size();
+	return sz[v];
+}
+
+bool cmpSz(int u, int v) {
+	return sz[u] < sz[v];
+}
+
+void build(int v) {
+	auto mx = max_element(g[v].begin(), g[v].end(), cmpSz);
+	if (mx == g[v].end()) {
+		hvl_path.pb(mp(v, 0));
+
+		vector <int> values(hvl_path.size());
+		for (int i = 0; i < hvl_path.size(); ++i) {
+			values[i] = hvl_path[i].second;
+		}
+		tree *t = new tree(values);
+
+		for (size_t i = 0; i < hvl_path.size(); ++i) {
+			tree_pos[hvl_path[i].first] = i;
+			hvl_tree[hvl_path[i].first] = t;
+			tree_end[hvl_path[i].first] = hvl_path[0].first;
+		}
+		hvl_path.clear();
 	}
 	else {
-		return suml + sumr;
+		hvl_path.pb(mp(v, (cnt_sum[v] - all_sum[*mx] * (li)all_sum[*mx]) % mod));
+		next_in_tree[v] = *mx;
+		build(*mx);
 	}
-}
 
-void build_one(int start) {
-	int curc = paths.size();
-	paths.push_back(vector <int>());
-	trees.push_back(vector <node>());
-	
-	int curv = start;
-
-	bool f = true;
-
-	while (f) {
-		paths[curc].push_back(curv);
-		color[curv] = curc;
-		
-		f = false;
-		for (int i = 0; i < g[curv].size(); ++i) {
-			int to = g[curv][i];
-			if (to == parent[curv]) {
-				continue;
-			}
-			if (is_heavy(curv, to)) {
-				f = true;
-				curv = to;
-				break;
-			}
+	assert(hvl_path.empty());
+	for (auto it = g[v].begin(); it != g[v].end(); ++it) {
+		if (mx != it) {
+			build(*it);
 		}
 	}
-	
-	reverse(paths[curc].begin(), paths[curc].end());
-	for (int i = 0; i < paths[curc].size(); ++i) {
-		path_position[paths[curc][i]] = i;
-	}
-	int tmp = init_rsq(trees[curc], 0, paths[curc].size() - 1); 
-	roots.push_back(tmp);
 }
 
-void build_all(int v) {
-	if (parent[v] == -1 || !is_heavy(parent[v], v)) {
-		build_one(v);
-	}
-	for (int i = 0; i < g[v].size(); ++i) {
-		int to = g[v][i];
-		if (to == parent[v]) {
-			continue;
-		}
-		build_all(to);
-	}
-}
-
-bool upper(int v1, int v2) {
-	if (time_in[v1] < time_in[v2] && time_out[v2] < time_out[v1]) {
-		return true;
-	}
-	return false;
-}
-
-int lca(int v1, int v2) {
-	if (upper(v1, v2)) {
-		return v1;
-	}
-	if (upper(v2, v1)) {
-		return v2;
-	}
-
-	for (int i = log_n - 1; i >= 0; --i) {
-		if (up[v2][i] == -1)
-			continue;
-		if (!upper(up[v2][i], v1)) {
-			v2 = up[v2][i];
+inline int jump(int u, int d) {
+	for (int k = 0; d; d /= 2, ++k) {
+		if (d & 1) {
+			u = anc[k][u];
 		}
 	}
-
-	return parent[v2];
+	return u;
 }
 
-int query(int v1, int v2) {
-	int ans = 0;
-	int last = -1;
-	int tmp1, tmp2;
-	
-	while (color[v1] != color[v2]) {
-		ans += get_rsq(path_position[v1], paths[color[v1]].size() - 1, roots[color[v1]], trees[color[v1]], 0, paths[color[v1]].size() - 1, tmp1, tmp2);
-		if (last != tmp1 && last != -1) {
-			++ans;
-		}
-		last = tmp2;
-		v1 = parent[paths[color[v1]][paths[color[v1]].size() - 1]];
+inline int getlca(int u, int v) {
+	if (depth[u] < depth[v]) {
+		swap(u, v);
 	}
-	
-	ans += get_rsq(path_position[v1], path_position[v2], roots[color[v1]], trees[color[v1]], 0, paths[color[v1]].size() - 1, tmp1, tmp2);
-	if (tmp1 != last && last != -1) {
-		++ans;
+	u = jump(u, depth[u] - depth[v]);
+	if (u == v)	{
+		return u;
+	}
+	for (int d = log_n - 1; d >= 0; --d) {
+		if (anc[d][u] != anc[d][v]) {
+			u = anc[d][u];
+			v = anc[d][v];
+		}
+	}
+	return anc[0][u];
+}
+
+
+void update_hvl(int v, int old_v, int new_v) {
+	int from = -1;
+
+	while (true) {
+		if (from != -1) {
+			int old_sum = my_rsq->getsum(my_ch[from].first, my_ch[from].second);
+			int new_sum = (old_sum + (li)new_v - old_v) % mod;
+			old_sum = (old_sum * (li)old_sum) % mod;
+			new_sum = (new_sum * (li)new_sum) % mod;
+			hvl_tree[v]->modify(tree_pos[v], (new_sum - old_sum) % mod, true);
+		}
+		if (hvl_tree[v] == hvl_tree[tree_root]) {
+			break;
+		}
+		from = tree_end[v];
+		v = anc[0][tree_end[v]];
+	}
+}
+
+inline int goup(int v, int p) {
+	int ans = 0, prevc = 0;
+	int prevv = -1;
+	while (true) {
+		int l = hvl_tree[v] == hvl_tree[p] ? tree_pos[p] : 0;
+		int r = tree_pos[v] + 1;
+
+		if (next_in_tree[v] != -1) {
+			int temp = my_rsq->getsum(my_ch[next_in_tree[v]].first, my_ch[next_in_tree[v]].second);
+			temp = (temp * (li)temp) % mod;
+			ans += temp;
+			ans %= mod;
+		}
+		if (prevv != -1) {
+			int temp = my_rsq->getsum(my_ch[prevv].first, my_ch[prevv].second);
+			temp = (temp * (li)temp) % mod;
+			ans = (ans - temp) % mod;
+		}
+
+		ans += hvl_tree[v]->getsum(l, r);
+		ans %= mod;
+
+		if (hvl_tree[v] == hvl_tree[p]) {
+			break;
+		}
+		else {
+			prevv = tree_end[v];
+			v = anc[0][tree_end[v]];
+		}
 	}
 	return ans;
 }
 
-void update(int v1, int v2, int x) {
-	int tmp1, tmp2;
-	
-	while (color[v1] != color[v2]) {
-		add(path_position[v1], paths[color[v1]].size() - 1, roots[color[v1]], trees[color[v1]], x, 0, paths[color[v1]].size() - 1);
-		v1 = parent[paths[color[v1]][paths[color[v1]].size() - 1]];
-	}
-	
-	add(path_position[v1], path_position[v2], roots[color[v1]], trees[color[v1]], x, 0, paths[color[v1]].size() - 1);
-}
-
 void solve() {
-	//в дереве нужно было находить количество различных подряд идущих на пути
-	scanf("%d", &n);
-	
-	log_n = 0;
-	while ((1 << log_n) <= n) {
-		++log_n;
-	}
-	log_n += 2;
+	//cnt_sum.clear();
+	allv.clear();
+	//my_ch.clear();
+	//w.clear();
+	//hvl_tree.clear();
+	//sz.clear();
+	g.clear();
+	//anc.clear();
+	//depth.clear();
+	//tree_end.clear();
+	//tree_pos.clear();
+	//next_in_tree.clear();
 
-	path_position.resize(n);
+	cin >> n >> m;
+
+	for (int i = 0; i < n; ++i) {
+		next_in_tree[i] = -1;
+	}
+	//depth.resize(n);
+	//my_ch.resize(n);
 	g.resize(n);
-	up.resize(n);
-	sum.resize(n);
-	time_in.resize(n);
-	time_out.resize(n);
-	parent.resize(n);
-	color.resize(n);
-	//used.assign(n, 0);
-
-	for (int i = 0; i < n - 1; ++i) {
-		int x, y;
-		scanf("%d %d", &x, &y);
-		--x;
-		--y;
-		g[x].push_back(y);
-		g[y].push_back(x);
-	}
-	parent[0] = -1;
-
-	int timer = 0;
-	dfs(0, timer);
-	build_all(0);	
-
-	int q;
-	scanf("%d", &q);
-	
-	for (int i = 1; i <= n; ++i)
-		update(i - 1, i - 1, i);
-
-	for (int t = n + 1; t <= n + q; ++t) {
-		int v1, v2, type;
-		scanf("%d %d %d", &type, &v1, &v2);
-		--v1;
-		--v2;
-		if (v1 == v2) {
-			if (type == 0) {
-				printf("0\n");
-			}
-			else {
-				update(v1, v2, t);
-			}
-			
-			continue;
+	//tree_end.resize(n);
+	//sz.resize(n);
+	//cnt_sum.resize(n);
+	//w.resize(n);
+	//hvl_tree.resize(n);
+	//tree_pos.resize(n);
+	//anc.resize(log_n, vector <int>(n, tree_root));
+	for (int i = 0; i < log_n; ++i) {
+		for (int j = 0; j < n; ++j) {
+			anc[i][j] = tree_root;
 		}
-		int v = lca(v1, v2);
-		int ans;
+	}
+
+	for (int i = 0; i < n; ++i) {
+		cin >> w[i];
+	}
+
+	for (int i = 1; i < n; ++i) {
+		int a, b;
+		cin >> a >> b;
+		--a;
+		--b;
+		g[a].pb(b);
+		g[b].pb(a);
+	}
+
+	dfs(0, -1);
+	
+	vector <int> perm_w(n);
+	for (int i = 0; i < perm_w.size(); ++i) {
+		perm_w[i] = w[allv[i]];
+	}
+	my_rsq = new tree(perm_w);
+
+	for (int i = 1; i < log_n; ++i) {
+		for (int v = 0; v < n; ++v) {
+			anc[i][v] = anc[i - 1][anc[i - 1][v]];
+		}
+	}
+
+	build(0);
+
+	for (int t = 0; t < m; ++t) {
+		int type;
+		cin >> type;
+		if (type == 1) {
+			int u, new_w;
+			cin >> u >> new_w;
+			--u;
 			
-		if (v == v1 || v == v2) {
-			if (v == v1) {
-				swap(v1, v2);
-			}
 			
-			if (type == 0) {
-				ans = query(v1, v2);				
-			}
-			else {
-				update(v1, v2, t);				
-			}
+			update_hvl(u, w[u], new_w);
+			my_rsq->modify(my_ch[u].first, new_w);
+			w[u] = new_w;
 		}
 		else {
-			if (type == 0) {
-				int tmp1 = query(v1, v);
-				int tmp2 = query(v2, v);
-				ans = tmp1 + tmp2;
+			int u, v;
+			cin >> u >> v;
+			--u;
+			--v;
+			int lca = getlca(u, v);
+			int res;
+			if (lca == u || lca == v) {
+				res = goup(-lca + u + v, lca);
 			}
 			else {
-				update(v1, v, t);
-				update(v2, v, t);
+				res = (goup(u, lca) + goup(v, lca)) % mod;
+				int all_lca = hvl_tree[lca]->getsum(tree_pos[lca], tree_pos[lca] + 1);
+				int hvl_next = my_rsq->getsum(my_ch[next_in_tree[lca]].first, my_ch[next_in_tree[lca]].second);
+				hvl_next = (hvl_next * (li)hvl_next) % mod;
+				all_lca = (all_lca + hvl_next) % mod;
+				res = (res - all_lca) % mod;
 			}
-		}
 
-		if (type == 0) {
-			printf("%d\n", ans);
+			int sumall = my_rsq->getsum(0, n);
+			int not_intersect = (sumall - my_rsq->getsum(my_ch[lca].first, my_ch[lca].second)) % mod;
+			res = (sumall * li(sumall) - res - not_intersect * (li)not_intersect) % mod;
+			if (res < 0) {
+				res += mod;
+			}
+			cout << res << "\n";
 		}
 	}
 }
