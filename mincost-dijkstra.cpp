@@ -73,9 +73,6 @@ pair<int, int_e> mincost(int n, int s, int t) {
 			q.pop();
 			if(oldD != d[v])
 				continue;
-			//if(v == t)
-			//	break;
-			// Хер знает, можно ли так делать
 			for(int id: g[v]) {
 				edge& e = edges[id];
 				if (e.to == s)
