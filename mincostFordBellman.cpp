@@ -3,7 +3,6 @@
 #include <cassert>
 using namespace std;
 
-const int maxn = 2002;
 const int NEED_FLOW = 1000000000;
 typedef long long int_e;
 
