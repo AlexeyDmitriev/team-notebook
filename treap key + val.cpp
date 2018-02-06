@@ -102,7 +102,7 @@ public:
 		return v;
 	}
 
-	void insert(int key, int val) { //insert at the idx - position
+	void insert(int key, int val) {
 		node l = nullptr, r = nullptr;
 		split(root, key, l, r);
 		node cur_node = new _node(key, val);
