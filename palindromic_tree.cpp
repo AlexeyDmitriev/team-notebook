@@ -1,100 +1,3 @@
-#pragma comment(linker, "/STACK:512000000")
-#define _CRT_SECURE_NO_WARNINGS
-//#include "testlib.h"
-#include <bits/stdc++.h>
-using namespace std;
-
-#define all(a) a.begin(), a.end()
-typedef long long li;
-typedef long double ld;
-void solve(bool);
-void precalc();
-clock_t start;
-int main() {
-#ifdef AIM
-  freopen("/home/alexandero/ClionProjects/ACM/input.txt", "r", stdin);
-  //freopen("/home/alexandero/ClionProjects/ACM/output.txt", "w", stdout);
-  //freopen("out.txt", "w", stdout);
-#else
-  //freopen("input.txt", "r", stdin);
-  //freopen("output.txt", "w", stdout);
-#endif
-  start = clock();
-  int t = 1;
-  cout.sync_with_stdio(0);
-  cin.tie(0);
-  precalc();
-  cout.precision(10);
-  cout << fixed;
-  //cin >> t;
-  int testNum = 1;
-  while (t--) {
-    //cout << "Case #" << testNum++ << ": ";
-    //cerr << testNum << endl;
-    solve(true);
-    //cerr << testNum - 1 << endl;
-  }
-  cout.flush();
-#ifdef AIM1
-  while (true) {
-      solve(false);
-  }
-#endif
-
-#ifdef AIM
-  cerr << "\n\n time: " << (clock() - start) / 1.0 / CLOCKS_PER_SEC << "\n\n";
-#endif
-
-  return 0;
-}
-
-//BE CAREFUL: IS INT REALLY INT?
-
-template<typename T>
-T binpow(T q, T w, T mod) {
-  if (!w)
-    return 1 % mod;
-  if (w & 1)
-    return q * 1LL * binpow(q, w - 1, mod) % mod;
-  return binpow(q * 1LL * q % mod, w / 2, mod);
-}
-
-template<typename T>
-T gcd(T q, T w) {
-  while (w) {
-    q %= w;
-    swap(q, w);
-  }
-  return q;
-}
-template<typename T>
-T lcm(T q, T w) {
-  return q / gcd(q, w) * w;
-}
-
-template <typename T>
-void make_unique(vector<T>& a) {
-  sort(all(a));
-  a.erase(unique(all(a)), a.end());
-}
-
-void precalc() {
-
-}
-
-template<typename T>
-void relax_min(T& cur, T val) {
-  cur = min(cur, val);
-}
-
-template<typename T>
-void relax_max(T& cur, T val) {
-  cur = max(cur, val);
-}
-
-//#define int li
-//const int mod = 1000000007;
-
 struct Node {
     int len;
     int link;
@@ -211,7 +114,6 @@ struct Eertree {
                 v = nodes[v].trans[c];
             }
             state[i] = v;
-            //cout << nodes[v].len << " " << nodes[nodes[v].link].len << endl;
         }
         return state;
     }
@@ -267,7 +169,6 @@ struct Eertree {
     double sum_jumps = 0.0, sum_calc_sum = 0, sum_inc = 0;
 
     void modify_state(int v, int len, int val) {
-        //clock_t start = clock();
         for (int i = 16; i >= 0; --i) {
             if (nodes[parent[i][v]].len >= len) {
                 v = parent[i][v];
@@ -277,33 +178,13 @@ struct Eertree {
             v = parent[0][v];
         }
         assert(v);
-
-        //sum_jumps += (clock() - start) / 1.0 / CLOCKS_PER_SEC;
-        //start = clock();
-
-        //cout << nodes[v].len << " " << val << endl;
-
-        //cout << "update: " << v << " " << val << endl;
-
         int cur_val = sum_tree.sum(tin[v], tout[v] - 1);
         if (cur_val == 0 && cur_val + val > 0) {
             ++have_pals;
-            //cout << "inc " << nodes[v].len << endl;
         } else if (cur_val > 0 && cur_val + val == 0) {
             --have_pals;
-            //cout << "dec " << nodes[v].len << endl;
         }
-
-        //sum_calc_sum += (clock() - start) / 1.0 / CLOCKS_PER_SEC;
-        //start = clock();
-
         sum_tree.inc(tin[v], val);
-
-        //sum_inc += (clock() - start) / 1.0 / CLOCKS_PER_SEC;
-    }
-
-    void print_times() {
-        cout << "jumps: " << sum_jumps << endl << "calc: " << sum_calc_sum << endl << "inc: " << sum_inc << endl;
     }
 
     int get_res() const {
@@ -325,16 +206,7 @@ struct Query {
 void solve(bool read) {
     read = false;
     string s;
-    if (read) {
-        cin >> s;
-    } else {
-        s = string(100000, 'a');
-        for (int i = 0; i < s.length(); ++i) {
-            //s[i] = (char)('a' + rand() % 26);
-        }
-    }
-
-    //clock_t start = clock();
+    cin >> s;
     Eertree tree;
     auto prefix_states = tree.feed_string(s);
     tree.calc_ups();
@@ -342,19 +214,6 @@ void solve(bool read) {
     auto suffix_states = tree.feed_string(s);
     reverse(all(s));
     reverse(all(suffix_states));
-
-    //cout << (clock() - start) / 1.0 / CLOCKS_PER_SEC << endl;
-
-    /*for (int i = 0; i < s.length(); ++i) {
-        cout << tree.nodes[prefix_states[i]].len << " ";
-    }
-    cout << endl;
-
-    for (int i = 0; i < s.length(); ++i) {
-        cout << tree.nodes[suffix_states[i]].len << " ";
-    }
-    cout << endl;*/
-
     int Q;
     if (read) {
         cin >> Q;
@@ -381,20 +240,6 @@ void solve(bool read) {
         --cur.l;
         cur.id = i;
         q[cur.l / block_size].push_back(cur);
-
-        /*set<string> her;
-        for (int j = cur.l; j < cur.r; ++j) {
-            for (int r = j + 1; r <= cur.r; ++r) {
-                string cur_s = s.substr(j, r - j);
-                string rev_s = cur_s;
-                reverse(all(rev_s));
-                if (rev_s == cur_s) {
-                    her.insert(cur_s);
-                }
-            }
-        }
-        stupid_ans[i] = her.size();*/
-
     }
 
     vector<int> ans(Q);
@@ -423,32 +268,7 @@ void solve(bool read) {
 
     li sum_ans = 0;
     for (int i = 0; i < Q; ++i) {
-        if (read) {
-            cout << ans[i] << "\n";
-        } else {
-
-            /*if (ans[i] != stupid_ans[i]) {
-                cout << "found " << i + 1 << endl;
-                cout << "ans: " << ans[i] << " stupid: " << stupid_ans[i] << endl;
-                cout << s << endl;
-                for (int j = 0; j < blocks; ++j) {
-                    for (auto& qu : q[j]) {
-                        if (qu.id == i) {
-                            cout << qu.l << " " << qu.r << endl;
-                            break;
-                        }
-                    }
-                }
-                exit(0);
-            }*/
-
-            sum_ans += ans[i];
-        }
-    }
-
-    if (!read) {
-        cout << sum_ans << endl;
-        tree.print_times();
+        cout << ans[i] << "\n";
     }
 
 }
