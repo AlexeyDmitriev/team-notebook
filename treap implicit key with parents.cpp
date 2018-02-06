@@ -1,9 +1,3 @@
-﻿enum {
-	ROOT,
-	LEFT_SON,
-	RIGHT_SON
-};
-
 class Treap {
 public:
 	typedef struct _node {
@@ -14,7 +8,7 @@ public:
 		_node* r;
 		_node *p;
 		int pType;
-		_node(int val) :val(val), l(nullptr), r(nullptr), cnt(1), pType(ROOT) { prior = (rand() << 16) | rand(); }
+		_node(int val) :val(val), l(nullptr), r(nullptr), cnt(1) { prior = (rand() << 16) | rand(); }
 
 		void push() {
 			
@@ -24,14 +18,11 @@ public:
 			cnt = 1 + Cnt(l) + Cnt(r);
 			if (l) {
 				l->p = this;
-				l->pType = LEFT_SON;
 			}
 			if (r) {
 				r->p = this;
-				r->pType = RIGHT_SON;
 			}
 			p = nullptr;
-			pType = ROOT;
 		}
 
 		static int Cnt(_node* v) {
@@ -97,7 +88,7 @@ public:
 		return Size;
 	}
 
-	void insert(int idx, int val) { //insert at the idx - position
+	void insert(int idx, int val) {
 		node l = nullptr, r = nullptr;
 		split(root, idx, l, r);
 		node cur_node = new _node(val);
@@ -119,7 +110,7 @@ public:
 		}
 		int res = Cnt(v->l);
 		while (v->p) {
-			if (v->pType == RIGHT_SON) {
+			if (v->p->r == v) {
 				res += Cnt(v->p->l) + 1;
 			}
 			v = v->p;
